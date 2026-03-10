@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoachCali — Plateforme Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0ede8;
+  --text2: rgba(240,237,232,0.5);
+  --text3: rgba(240,237,232,0.25);
+  --accent: #d4f244;
+  --accent-dim: rgba(212,242,68,0.12);
+  --red: #ff4d2e;
+  --red-dim: rgba(255,77,46,0.12);
+  --gold: #f0a500;
+  --gold-dim: rgba(240,165,0,0.12);
+  --blue: #4d9fff;
+  --r: 4px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Instrument Sans',sans-serif; font-weight:400; min-height:100vh; }
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* ── UTILS ── */
+.hide { display:none !important; }
+.tag { display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; border-radius:20px; font-weight:600; }
+.tag-green { background:var(--accent-dim); color:var(--accent); }
+.tag-red { background:var(--red-dim); color:var(--red); }
+.tag-gold { background:var(--gold-dim); color:var(--gold); }
+.tag-blue { background:rgba(77,159,255,0.12); color:var(--blue); }
+
+/* ── SCREENS ── */
+.screen { display:none !important; min-height:100vh; }
+.screen.active { display:block !important; }
+.screen.active#screen-splash { display:flex !important; }
+
+/* ══════════════════════════════════════
+   SPLASH / LOGIN
+══════════════════════════════════════ */
+#screen-splash {
+  align-items:center; justify-content:center; min-height:100vh;
+  background: radial-gradient(ellipse at 30% 20%, rgba(212,242,68,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,77,46,0.04) 0%, transparent 60%), var(--bg);
+}
+.splash-inner { text-align:center; max-width:400px; padding:40px 24px; }
+.splash-logo { font-family:'Syne',sans-serif; font-size:52px; font-weight:800; letter-spacing:-2px; margin-bottom:6px; }
+.splash-logo span { color:var(--accent); }
+.splash-sub { color:var(--text2); font-size:14px; margin-bottom:40px; letter-spacing:0.5px; }
+.splash-card { background:var(--surface); border:1px solid var(--border2); padding:32px; border-radius:var(--r); }
+.splash-card h2 { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:6px; }
+.splash-card p { font-size:13px; color:var(--text2); margin-bottom:24px; }
+.field-group { margin-bottom:14px; text-align:left; }
+.field-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+.field-input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text); padding:11px 14px; font-size:14px; font-family:'Instrument Sans',sans-serif;
+  border-radius:var(--r); outline:none; transition:border-color 0.2s;
+}
+.field-input:focus { border-color:var(--accent); }
+.field-textarea { resize:vertical; min-height:75px; }
+.err { color:var(--red); font-size:12px; margin-top:8px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 20px; font-size:13px; font-weight:500; cursor:pointer;
+  border:none; border-radius:var(--r); transition:all 0.18s; white-space:nowrap;
+  font-family:'Instrument Sans',sans-serif; letter-spacing:0.3px;
+}
+.btn-accent { background:var(--accent); color:#0a0a0a; }
+.btn-accent:hover { background:#c8e830; }
+.btn-surface { background:var(--surface2); color:var(--text); border:1px solid var(--border2); }
+.btn-surface:hover { border-color:var(--border2); background:#222; }
+.btn-red { background:var(--red-dim); color:var(--red); border:1px solid rgba(255,77,46,0.2); }
+.btn-red:hover { background:rgba(255,77,46,0.2); }
+.btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
+.btn-ghost:hover { color:var(--text); border-color:var(--border2); }
+.btn-sm { padding:7px 13px; font-size:12px; }
+.btn-full { width:100%; }
+.btn-icon { padding:8px; aspect-ratio:1; }
+
+/* ══════════════════════════════════════
+   COACH DASHBOARD
+══════════════════════════════════════ */
+#screen-coach { background:var(--bg); }
+
+.coach-layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+
+/* sidebar */
+.sidebar {
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:24px 16px; display:flex; flex-direction:column; gap:6px;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.sidebar-logo { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; letter-spacing:-1px; padding:8px 12px; margin-bottom:14px; }
+.sidebar-logo span { color:var(--accent); }
+.sidebar-section { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); padding:6px 12px; margin-top:10px; }
+.sidebar-btn {
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  border-radius:var(--r); cursor:pointer; font-size:13px; color:var(--text2);
+  transition:all 0.15s; border:none; background:none; text-align:left; width:100%;
+}
+.sidebar-btn:hover { background:var(--surface2); color:var(--text); }
+.sidebar-btn.active { background:var(--accent-dim); color:var(--accent); }
+.sidebar-btn .icon { font-size:16px; width:20px; text-align:center; }
+.sidebar-bottom { margin-top:auto; padding-top:16px; border-top:1px solid var(--border); }
+.sidebar-coach-info { padding:10px 12px; }
+.sidebar-coach-name { font-size:13px; font-weight:600; }
+.sidebar-coach-role { font-size:11px; color:var(--text3); margin-top:2px; }
+
+/* main */
+.coach-main { padding:36px 40px; }
+.page-section { display:none; }
+.page-section.active { display:block; }
+
+/* stats bar */
+.stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:32px; }
+.stat-card {
+  background:var(--surface); border:1px solid var(--border); padding:20px 22px; border-radius:var(--r);
+}
+.stat-card-num { font-family:'Syne',sans-serif; font-size:34px; font-weight:800; line-height:1; }
+.stat-card-label { font-size:11px; color:var(--text2); margin-top:4px; letter-spacing:0.5px; }
+.stat-card-accent { border-top:2px solid var(--accent); }
+.stat-card-red { border-top:2px solid var(--red); }
+.stat-card-gold { border-top:2px solid var(--gold); }
+.stat-card-blue { border-top:2px solid var(--blue); }
+
+/* page header */
+.page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.page-title { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; }
+.page-sub { font-size:13px; color:var(--text2); margin-top:3px; }
+
+/* students list */
+.students-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.student-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:22px; cursor:pointer; transition:all 0.2s; position:relative;
+}
+.student-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.student-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.student-avatar {
+  width:42px; height:42px; border-radius:50%; background:var(--accent-dim);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:var(--accent);
+}
+.student-name { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:3px; }
+.student-goal { font-size:12px; color:var(--text2); }
+.student-progress-bar { height:4px; background:var(--surface2); border-radius:2px; margin:12px 0 8px; overflow:hidden; }
+.student-progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.5s ease; }
+.student-progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text3); }
+.student-card-actions { display:flex; gap:6px; margin-top:14px; }
+
+/* ── PROGRAMME BUILDER ── */
+.builder-layout { display:grid; grid-template-columns:280px 1fr; gap:24px; }
+.builder-sidebar { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:20px; height:fit-content; position:sticky; top:20px; }
+.builder-sidebar h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:16px; }
+
+.prog-meta-field { margin-bottom:12px; }
+.prog-meta-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:4px; }
+.prog-meta-input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text); padding:8px 11px; font-size:13px; font-family:'Instrument Sans',sans-serif;
+  border-radius:var(--r); outline:none;
+}
+.prog-meta-input:focus { border-color:var(--accent); }
+select.prog-meta-input option { background:var(--surface2); }
+
+.phases-list { display:flex; flex-direction:column; gap:12px; }
+.phase-item {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  overflow:hidden;
+}
+.phase-header {
+  display:flex; align-items:center; gap:10px; padding:14px 16px;
+  cursor:pointer; transition:background 0.15s;
+}
+.phase-header:hover { background:var(--surface2); }
+.phase-color-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.phase-header-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; flex:1; }
+.phase-header-meta { font-size:11px; color:var(--text3); }
+.phase-chevron { font-size:11px; color:var(--text3); transition:transform 0.2s; }
+.phase-chevron.open { transform:rotate(180deg); }
+.phase-body { display:none; padding:0 16px 14px; border-top:1px solid var(--border); }
+.phase-body.open { display:block; }
+
+.week-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 0; border-bottom:1px solid var(--border); font-size:13px;
+}
+.week-row:last-child { border-bottom:none; }
+.week-row-name { color:var(--text2); }
+.week-row-actions { display:flex; gap:4px; }
+
+/* ══════════════════════════════════════
+   ÉLÈVE VIEW
+══════════════════════════════════════ */
+#screen-student {
+  background: radial-gradient(ellipse at 20% 0%, rgba(212,242,68,0.04) 0%, transparent 50%), var(--bg);
+}
+.student-layout { max-width:900px; margin:0 auto; padding:32px 24px; }
+.student-topbar {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 24px; background:var(--surface); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:100;
+}
+.student-topbar-logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; letter-spacing:-0.5px; }
+.student-topbar-logo span { color:var(--accent); }
+
+.student-hero { padding:48px 0 36px; }
+.student-hero-tag { margin-bottom:16px; }
+.student-hero-name { font-family:'Syne',sans-serif; font-size:clamp(40px,6vw,72px); font-weight:800; line-height:0.95; letter-spacing:-2px; margin-bottom:16px; }
+.student-hero-name .hl { color:var(--accent); }
+.student-hero-meta { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:28px; }
+.hero-meta-item { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text2); }
+.hero-meta-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.coach-note-box {
+  background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent);
+  padding:18px 20px; border-radius:0 var(--r) var(--r) 0; margin-bottom:36px;
+}
+.coach-note-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+.coach-note-text { font-size:14px; color:var(--text2); line-height:1.7; font-style:italic; }
+
+/* phase tabs */
+.phase-tabs { display:flex; gap:6px; margin-bottom:24px; overflow-x:auto; padding-bottom:4px; }
+.phase-tab {
+  padding:9px 18px; border-radius:20px; font-size:12px; font-weight:500;
+  cursor:pointer; border:none; background:var(--surface); color:var(--text2);
+  transition:all 0.15s; white-space:nowrap; border:1px solid var(--border);
+}
+.phase-tab.active { background:var(--accent-dim); color:var(--accent); border-color:rgba(212,242,68,0.3); }
+.phase-tab:hover:not(.active) { background:var(--surface2); color:var(--text); }
+
+/* student phase view */
+.student-phase-panel { display:none; }
+.student-phase-panel.active { display:block; }
+
+.student-phase-banner {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:24px 28px; margin-bottom:20px;
+  display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
+}
+.spb-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin-bottom:6px; }
+.spb-desc { font-size:13px; color:var(--text2); line-height:1.6; }
+.spb-stats { display:flex; gap:16px; }
+.spb-stat { text-align:center; }
+.spb-stat-num { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:var(--accent); }
+.spb-stat-label { font-size:10px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+
+.weeks-list { display:flex; flex-direction:column; gap:10px; }
+.s-week-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  overflow:hidden; transition:border-color 0.2s;
+}
+.s-week-card.done { border-color:rgba(212,242,68,0.3); }
+.s-week-header {
+  display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer;
+  transition:background 0.15s;
+}
+.s-week-header:hover { background:var(--surface2); }
+.s-week-check {
+  width:28px; height:28px; border-radius:50%; border:2px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; font-size:13px;
+  transition:all 0.2s; flex-shrink:0; cursor:pointer;
+}
+.s-week-check.checked { background:var(--accent); border-color:var(--accent); color:#0a0a0a; }
+.s-week-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; flex:1; }
+.s-week-meta { font-size:11px; color:var(--text3); }
+.s-week-days { display:flex; gap:4px; margin-left:auto; }
+.s-day-dot { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+.s-day-dot.training { background:rgba(212,242,68,0.2); color:var(--accent); }
+.s-day-dot.rest { background:var(--surface2); color:var(--text3); }
+.s-week-expand { font-size:12px; color:var(--text3); transition:transform 0.2s; }
+.s-week-expand.open { transform:rotate(180deg); }
+
+.s-week-body { display:none; padding:4px 20px 18px; }
+.s-week-body.open { display:block; animation:fadeSlide 0.2s ease; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+
+.s-ex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; margin-top:12px; }
+.s-ex-card {
+  background:var(--surface2); border:1px solid var(--border); border-radius:var(--r);
+  padding:14px;
+}
+.s-ex-name { font-size:13px; font-weight:500; margin-bottom:5px; }
+.s-ex-sets { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--accent); }
+.s-ex-rest { font-size:11px; color:var(--text3); margin-top:2px; }
+.s-ex-tip { font-size:11px; color:var(--gold); margin-top:7px; border-top:1px solid var(--border); padding-top:7px; font-style:italic; }
+
+/* progress bar (student) */
+.overall-progress { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:20px 24px; margin-bottom:24px; }
+.op-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.op-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
+.op-pct { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--accent); }
+.op-bar { height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+.op-fill { height:100%; background:var(--accent); border-radius:3px; transition:width 0.6s ease; }
+.op-weeks { display:grid; grid-template-columns:repeat(auto-fill,minmax(44px,1fr)); gap:6px; margin-top:12px; }
+.op-week { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:8px 4px; text-align:center; cursor:pointer; transition:all 0.15s; }
+.op-week:hover { border-color:var(--border2); }
+.op-week.done { background:var(--accent-dim); border-color:rgba(212,242,68,0.3); }
+.op-week-n { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; }
+.op-week-check { font-size:10px; color:var(--text3); }
+.op-week.done .op-week-check { color:var(--accent); }
+
+/* ── MODAL ── */
+.modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:500;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-box {
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:calc(var(--r)*2); padding:32px; width:100%;
+  max-width:480px; max-height:88vh; overflow-y:auto;
+}
+.modal-box.modal-wide { max-width:680px; }
+.modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.modal-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; }
+.modal-close { background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; padding:4px; transition:color 0.15s; }
+.modal-close:hover { color:var(--text); }
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.modal-divider { height:1px; background:var(--border); margin:20px 0; }
+
+/* week builder modal */
+.week-builder-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.day-selector { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.day-toggle {
+  width:34px; height:34px; border-radius:50%; border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-size:11px; font-weight:600; color:var(--text2); transition:all 0.15s;
+  background:var(--surface2);
+}
+.day-toggle.on { background:var(--accent-dim); border-color:rgba(212,242,68,0.4); color:var(--accent); }
+
+.ex-list-builder { display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:280px; overflow-y:auto; }
+.ex-row-builder {
+  display:grid; grid-template-columns:1fr 100px 80px auto;
+  gap:8px; align-items:center; background:var(--surface2);
+  border:1px solid var(--border); border-radius:var(--r); padding:10px 12px;
+}
+.ex-row-input {
+  background:transparent; border:none; color:var(--text); font-size:13px;
+  font-family:'Instrument Sans',sans-serif; outline:none; width:100%;
+}
+.ex-row-input::placeholder { color:var(--text3); }
+.ex-del-btn { background:none; border:none; color:var(--text3); cursor:pointer; font-size:16px; padding:2px; transition:color 0.15s; }
+.ex-del-btn:hover { color:var(--red); }
+
+/* phase builder in modal */
+.phase-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* copy template */
+.template-list { display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; }
+.template-item {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--r); padding:12px 14px; cursor:pointer; transition:all 0.15s;
+}
+.template-item:hover { border-color:var(--accent); background:var(--accent-dim); }
+.template-name { font-size:14px; font-weight:500; }
+.template-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+
+/* share link */
+.share-box {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--r); padding:14px; display:flex; align-items:center; gap:10px;
+}
+.share-link { flex:1; font-size:12px; color:var(--text2); word-break:break-all; font-family:monospace; }
+.copy-btn { background:var(--accent-dim); border:none; color:var(--accent); padding:8px 14px; font-size:12px; cursor:pointer; border-radius:var(--r); white-space:nowrap; font-weight:600; }
+.copy-btn:hover { background:rgba(212,242,68,0.2); }
+
+/* responsive */
+@media(max-width:900px) {
+  .coach-layout { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .coach-main { padding:20px 16px; }
+  .stats-bar { grid-template-columns:1fr 1fr; }
+  .builder-layout { grid-template-columns:1fr; }
+  .student-hero-name { font-size:42px; }
+  .spb-stats { display:none; }
+  .s-week-days { display:none; }
+}
+@media(max-width:500px) {
+  .stats-bar { grid-template-columns:1fr; }
+  .week-builder-grid { grid-template-columns:1fr; }
+  .phase-form-grid { grid-template-columns:1fr; }
+  .ex-row-builder { grid-template-columns:1fr auto auto auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SPLASH / LOGIN ══════════ -->
+<div id="screen-splash" class="screen active">
+  <div class="splash-inner">
+    <div class="splash-logo">COACH<span>CALI</span></div>
+    <p class="splash-sub">Plateforme de coaching callisthénie</p>
+    <div class="splash-card">
+      <h2>Connexion Coach</h2>
+      <p>Accédez à votre espace pour gérer vos élèves et programmes</p>
+      <div class="field-group">
+        <div class="field-label">Nom du coach</div>
+        <input id="login-name" class="field-input" type="text" placeholder="Votre nom">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Mot de passe</div>
+        <input id="login-pw" class="field-input" type="password" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="login-err" class="err hide">Mot de passe incorrect</div>
+      <button class="btn btn-accent btn-full" style="margin-top:8px" onclick="doLogin()">Accéder au tableau de bord →</button>
+      <p style="font-size:11px;color:var(--text3);margin-top:16px;text-align:center">Mot de passe par défaut : <strong style="color:var(--text2)">coach2024</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ COACH DASHBOARD ══════════ -->
+<div id="screen-coach" class="screen">
+  <div class="coach-layout">
+
+    <!-- sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">COACH<span>CALI</span></div>
+      <div class="sidebar-section">Navigation</div>
+      <button class="sidebar-btn active" onclick="showCoachPage('dashboard',this)">
+        <span class="icon">📊</span> Tableau de bord
+      </button>
+      <button class="sidebar-btn" onclick="showCoachPage('students',this)">
+        <span class="icon">👥</span> Mes élèves
+      </button>
+      <button class="sidebar-btn" onclick="showCoachPage('templates',this)">
+        <span class="icon">📋</span> Modèles
+      </button>
+      <div class="sidebar-bottom">
+        <div class="sidebar-coach-info">
+          <div class="sidebar-coach-name" id="sidebar-coach-name">—</div>
+          <div class="sidebar-coach-role">Coach</div>
+        </div>
+        <button class="sidebar-btn" onclick="logout()" style="margin-top:6px">
+          <span class="icon">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main class="coach-main">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page-section active">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Bonjour, <span id="dash-coach-name">Coach</span> 👋</div>
+            <div class="page-sub">Voici un aperçu de vos élèves</div>
+          </div>
+        </div>
+        <div class="stats-bar">
+          <div class="stat-card stat-card-accent">
+            <div class="stat-card-num" id="stat-total">0</div>
+            <div class="stat-card-label">Élèves actifs</div>
+          </div>
+          <div class="stat-card stat-card-green">
+            <div class="stat-card-num" id="stat-progs">0</div>
+            <div class="stat-card-label">Programmes créés</div>
+          </div>
+          <div class="stat-card stat-card-gold">
+            <div class="stat-card-num" id="stat-avg">0%</div>
+            <div class="stat-card-label">Progression moyenne</div>
+          </div>
+          <div class="stat-card stat-card-blue">
+            <div class="stat-card-num" id="stat-weeks">0</div>
+            <div class="stat-card-label">Semaines totales</div>
+          </div>
+        </div>
+        <div class="page-header" style="margin-top:8px">
+          <div class="page-title" style="font-size:18px">Élèves récents</div>
+          <button class="btn btn-accent btn-sm" onclick="openNewStudentModal()">+ Nouvel élève</button>
+        </div>
+        <div class="students-grid" id="dash-students-grid"></div>
+        <div id="dash-empty" class="hide" style="text-align:center;padding:60px 0;color:var(--text3)">
+          <div style="font-size:48px;margin-bottom:12px">👤</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;margin-bottom:6px">Aucun élève pour l'instant</div>
+          <div style="font-size:13px;margin-bottom:20px">Créez votre premier profil élève</div>
+          <button class="btn btn-accent" onclick="openNewStudentModal()">+ Créer un élève</button>
+        </div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div id="page-students" class="page-section">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Mes élèves</div>
+            <div class="page-sub" id="students-count-label">0 élève</div>
+          </div>
+          <button class="btn btn-accent" onclick="openNewStudentModal()">+ Nouvel élève</button>
+        </div>
+        <div class="students-grid" id="students-grid"></div>
+        <div id="students-empty" class="hide" style="text-align:center;padding:60px 0;color:var(--text3)">
+          <div style="font-size:48px;margin-bottom:12px">👥</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px">Aucun élève</div>
+          <button class="btn btn-accent" style="margin-top:16px" onclick="openNewStudentModal()">+ Créer le premier élève</button>
+        </div>
+      </div>
+
+      <!-- TEMPLATES -->
+      <div id="page-templates" class="page-section">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Modèles de programmes</div>
+            <div class="page-sub">Programmes prêts à copier vers un élève</div>
+          </div>
+          <button class="btn btn-accent" onclick="openNewTemplateModal()">+ Nouveau modèle</button>
+        </div>
+        <div class="students-grid" id="templates-grid"></div>
+        <div id="templates-empty" style="text-align:center;padding:60px 0;color:var(--text3)">
+          <div style="font-size:48px;margin-bottom:12px">📋</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px">Aucun modèle</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT VIEW ══════════ -->
+<div id="screen-student" class="screen">
+  <div class="student-topbar">
+    <div class="student-topbar-logo">COACH<span>CALI</span></div>
+    <div id="student-topbar-coach" style="font-size:12px;color:var(--text3)"></div>
+  </div>
+  <div class="student-layout">
+    <div class="student-hero">
+      <div class="student-hero-tag"><span class="tag tag-green" id="s-programme-tag">Programme Callisthénie</span></div>
+      <div class="student-hero-name" id="s-student-name">Prénom<br><span class="hl">NOM</span></div>
+      <div class="student-hero-meta" id="s-hero-meta"></div>
+      <div class="coach-note-box">
+        <div class="coach-note-label">Message de <span id="s-coach-name-display">votre coach</span></div>
+        <p class="coach-note-text" id="s-coach-note">"Bienvenue dans votre programme !"</p>
+      </div>
+    </div>
+
+    <div class="overall-progress">
+      <div class="op-header">
+        <div class="op-title">Progression globale</div>
+        <div class="op-pct" id="s-pct">0%</div>
+      </div>
+      <div class="op-bar"><div class="op-fill" id="s-prog-fill" style="width:0%"></div></div>
+      <div class="op-weeks" id="s-weeks-dots"></div>
+    </div>
+
+    <div class="phase-tabs" id="s-phase-tabs"></div>
+    <div id="s-phase-panels"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<div id="modal-bg" class="modal-bg hide" onclick="closeModalBg(event)">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONSTANTS & STATE
+// ═══════════════════════════════════════════════
+const COACH_PW    = "coach2024";
+const STORE_KEY   = "coacali-v1";
+const DAY_LABELS  = ["L","M","M","J","V","S","D"];
+
+const PHASE_COLORS = ["#d4f244","#f0a500","#ff4d2e","#4d9fff","#b57aff","#ff9f43"];
+
+const DEFAULT_EXERCISES = [
+  {name:"Pompes",sets:"3 × 10",rest:"60s",tip:"Coudes à 45°"},
+  {name:"Squat",sets:"3 × 15",rest:"60s",tip:"Genoux dans l'axe"},
+  {name:"Gainage",sets:"3 × 30s",rest:"45s",tip:"Corps aligné"},
+  {name:"Fentes",sets:"3 × 10/jambe",rest:"60s",tip:"Genou à 90°"},
+  {name:"Burpees",sets:"3 × 8",rest:"90s",tip:"Explosif"},
+];
+
+let state = {
+  coachName: "",
+  students: [],    // [{id, name, goal, note, programId, progress:[weekIds]}]
+  programs: [],    // [{id, name, studentId|null, totalWeeks, phases:[{id,title,color,desc,weeks:[{id,title,days,exercises:[]}]}]}]
+};
+
+let currentStudentId = null; // for student view
+
+// ─── uid ───
+function uid() { return "_"+Math.random().toString(36).slice(2,9); }
+
+// ═══════════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════════
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function load() {
+  try {
+    const d = localStorage.getItem(STORE_KEY);
+    if (d) { const p = JSON.parse(d); if(p.students) state = p; }
+  } catch(e) {}
+}
+
+// student progress stored separately per student
+function getProgress(studentId) {
+  try { const d = localStorage.getItem("prog-"+studentId); return d ? JSON.parse(d) : []; } catch(e) { return []; }
+}
+function setProgress(studentId, arr) {
+  try { localStorage.setItem("prog-"+studentId, JSON.stringify(arr)); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+//  SCREENS
+// ═══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+// ─── LOGIN ───
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim() || "Coach";
+  const pw   = document.getElementById('login-pw').value;
+  if (pw !== COACH_PW) {
+    document.getElementById('login-err').classList.remove('hide');
+    return;
+  }
+  state.coachName = name;
+  save();
+  showScreen('coach');
+  document.getElementById('sidebar-coach-name').textContent = name;
+  document.getElementById('dash-coach-name').textContent = name;
+  renderDashboard();
+}
+
+function logout() {
+  showScreen('splash');
+  document.getElementById('login-pw').value = '';
+}
+
+// ─── COACH PAGES ───
+function showCoachPage(page, btn) {
+  document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (page==='students') renderStudents();
+  if (page==='templates') renderTemplates();
+}
+
+// ═══════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const total = state.students.length;
+  const progs = state.programs.length;
+  let totalWeeks = 0, totalProg = 0, progCount = 0;
+  state.students.forEach(s => {
+    const prog = getProgramForStudent(s.id);
+    if (prog) {
+      totalWeeks += prog.totalWeeks || 0;
+      const p = getProgress(s.id);
+      const tw = getAllWeekIds(prog).length;
+      if (tw > 0) { totalProg += Math.round((p.length/tw)*100); progCount++; }
+    }
+  });
+  const avg = progCount > 0 ? Math.round(totalProg/progCount) : 0;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-progs').textContent = progs;
+  document.getElementById('stat-avg').textContent = avg + "%";
+  document.getElementById('stat-weeks').textContent = totalWeeks;
+
+  const grid = document.getElementById('dash-students-grid');
+  const empty = document.getElementById('dash-empty');
+  if (total === 0) { grid.innerHTML=''; empty.classList.remove('hide'); return; }
+  empty.classList.add('hide');
+  grid.innerHTML = state.students.slice(0,6).map(s=>studentCardHTML(s)).join('');
+  document.getElementById('students-count-label').textContent = total + (total>1?' élèves':' élève');
+}
+
+function studentCardHTML(s) {
+  const prog = getProgramForStudent(s.id);
+  const progress = getProgress(s.id);
+  const totalW = prog ? getAllWeekIds(prog).length : 1;
+  const done = progress.length;
+  const pct = Math.round((done/totalW)*100);
+  const initials = s.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  return `
+    <div class="student-card" onclick="openStudentDetail('${s.id}')">
+      <div class="student-card-top">
+        <div>
+          <div class="student-name">${esc(s.name)}</div>
+          <div class="student-goal">${esc(s.goal||'Objectif non défini')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="student-avatar">${initials}</div>
+          ${prog ? `<span class="tag tag-green">${prog.totalWeeks||'?'} sem.</span>` : `<span class="tag tag-red">Sans programme</span>`}
+        </div>
+      </div>
+      <div class="student-progress-bar"><div class="student-progress-fill" style="width:${pct}%"></div></div>
+      <div class="student-progress-label">
+        <span>${done} semaine${done>1?'s':''} complétée${done>1?'s':''}</span>
+        <span>${pct}%</span>
+      </div>
+      <div class="student-card-actions">
+        <button class="btn btn-surface btn-sm" onclick="event.stopPropagation();openStudentDetail('${s.id}')">Gérer</button>
+        <button class="btn btn-surface btn-sm" onclick="event.stopPropagation();openShareModal('${s.id}')">🔗 Lien élève</button>
+        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();deleteStudent('${s.id}')">🗑</button>
+      </div>
+    </div>`;
+}
+
+function renderStudents() {
+  const grid = document.getElementById('students-grid');
+  const empty = document.getElementById('students-empty');
+  if (state.students.length===0) { grid.innerHTML=''; empty.classList.remove('hide'); return; }
+  empty.classList.add('hide');
+  grid.innerHTML = state.students.map(s=>studentCardHTML(s)).join('');
+  document.getElementById('students-count-label').textContent = state.students.length + (state.students.length>1?' élèves':' élève');
+}
+
+function renderTemplates() {
+  const grid = document.getElementById('templates-grid');
+  const empty = document.getElementById('templates-empty');
+  const templates = state.programs.filter(p=>!p.studentId);
+  if (templates.length===0) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = templates.map(p=>`
+    <div class="student-card" onclick="openProgramEditor('${p.id}')">
+      <div class="student-card-top">
+        <div>
+          <div class="student-name">${esc(p.name)}</div>
+          <div class="student-goal">${p.phases.length} phase${p.phases.length>1?'s':''} · ${p.totalWeeks||'?'} semaines</div>
+        </div>
+        <span class="tag tag-blue">Modèle</span>
+      </div>
+      <div class="student-card-actions">
+        <button class="btn btn-surface btn-sm" onclick="event.stopPropagation();openProgramEditor('${p.id}')">✏️ Éditer</button>
+        <button class="btn btn-surface btn-sm" onclick="event.stopPropagation();openCopyTemplateModal('${p.id}')">📋 Copier vers élève</button>
+        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();deleteProgram('${p.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  STUDENT DETAIL
+// ═══════════════════════════════════════════════
+function openStudentDetail(sid) {
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) return;
+  const prog = getProgramForStudent(sid);
+
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">👤 ${esc(s.name)}</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Nom</div>
+        <input id="sd-name" class="field-input" value="${esc(s.name)}">
+      </div>
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Objectif</div>
+        <input id="sd-goal" class="field-input" value="${esc(s.goal||'')}">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Message personnalisé</div>
+      <textarea id="sd-note" class="field-input field-textarea" rows="3">${esc(s.note||'')}</textarea>
+    </div>
+    <div class="modal-divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Programme</div>
+      ${prog
+        ? `<div style="display:flex;gap:6px">
+             <button class="btn btn-surface btn-sm" onclick="closeModal();openProgramEditor('${prog.id}')">✏️ Éditer</button>
+             <button class="btn btn-red btn-sm" onclick="detachProgram('${sid}')">Retirer</button>
+           </div>`
+        : `<button class="btn btn-accent btn-sm" onclick="closeModal();openNewProgramModal('${sid}')">+ Créer</button>`
+      }
+    </div>
+    ${prog ? `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-weight:600;margin-bottom:4px">${esc(prog.name)}</div>
+        <div style="font-size:12px;color:var(--text3)">${prog.phases.length} phases · ${prog.totalWeeks||'?'} semaines</div>
+      </div>
+    ` : `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Aucun programme assigné</div>`}
+    <div class="modal-divider"></div>
+    <div class="modal-btns">
+      <button class="btn btn-accent" onclick="saveStudentDetail('${sid}')">Sauvegarder</button>
+      <button class="btn btn-surface" onclick="openShareModal('${sid}')">🔗 Lien élève</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
+    </div>
+  `, true);
+}
+
+function saveStudentDetail(sid) {
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) return;
+  s.name = document.getElementById('sd-name').value;
+  s.goal = document.getElementById('sd-goal').value;
+  s.note = document.getElementById('sd-note').value;
+  save(); closeModal(); renderDashboard(); renderStudents();
+}
+
+function detachProgram(sid) {
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) return;
+  if (!confirm('Retirer le programme de cet élève ?')) return;
+  // mark program as template instead
+  const prog = state.programs.find(p=>p.studentId===sid);
+  if (prog) delete prog.studentId;
+  s.programId = null;
+  save(); closeModal(); openStudentDetail(sid);
+}
+
+// ═══════════════════════════════════════════════
+//  NEW STUDENT
+// ═══════════════════════════════════════════════
+function openNewStudentModal() {
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">Nouvel élève</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Nom complet</div>
+      <input id="ns-name" class="field-input" placeholder="ex: Marie Dupont">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Objectif</div>
+      <input id="ns-goal" class="field-input" placeholder="ex: Perdre 8 kg en 3 mois">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Message du coach (optionnel)</div>
+      <textarea id="ns-note" class="field-input field-textarea" placeholder="Mot d'encouragement personnalisé..."></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Assigner un programme</div>
+      <select id="ns-prog" class="field-input" style="appearance:auto">
+        <option value="">— Créer un programme après —</option>
+        ${state.programs.filter(p=>!p.studentId).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-accent" onclick="createStudent()">Créer l'élève</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    </div>
+  `);
+}
+
+function createStudent() {
+  const name = document.getElementById('ns-name').value.trim();
+  if (!name) return;
+  const sid = uid();
+  const progId = document.getElementById('ns-prog').value;
+  const s = { id:sid, name, goal:document.getElementById('ns-goal').value, note:document.getElementById('ns-note').value, programId:progId||null };
+  state.students.push(s);
+  if (progId) { const p = state.programs.find(x=>x.id===progId); if(p) p.studentId=sid; }
+  save(); closeModal(); renderDashboard(); renderStudents();
+}
+
+function deleteStudent(sid) {
+  if (!confirm('Supprimer cet élève et son programme ?')) return;
+  state.students = state.students.filter(s=>s.id!==sid);
+  state.programs = state.programs.filter(p=>p.studentId!==sid);
+  save(); renderDashboard(); renderStudents();
+}
+
+// ═══════════════════════════════════════════════
+//  PROGRAM EDITOR
+// ═══════════════════════════════════════════════
+function getProgramForStudent(sid) {
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) return null;
+  return state.programs.find(p=>p.id===s.programId || p.studentId===sid) || null;
+}
+
+function getAllWeekIds(prog) {
+  const ids = [];
+  (prog.phases||[]).forEach(ph=>(ph.weeks||[]).forEach(w=>ids.push(w.id)));
+  return ids;
+}
+
+function openNewProgramModal(studentId) {
+  const s = studentId ? state.students.find(x=>x.id===studentId) : null;
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">Nouveau programme${s?' pour '+esc(s.name):''}</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Nom du programme</div>
+      <input id="np-name" class="field-input" placeholder="ex: Programme 12 semaines débutant">
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      Une structure de base (3 phases, 12 semaines) sera créée. Vous pourrez tout modifier ensuite.
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-accent" onclick="createProgram('${studentId||''}')">Créer et éditer →</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    </div>
+  `);
+}
+
+function openNewTemplateModal() {
+  openNewProgramModal('');
+}
+
+function createProgram(studentId) {
+  const name = document.getElementById('np-name').value.trim() || "Nouveau programme";
+  const pid = uid();
+  const prog = buildDefaultProgram(pid, name, studentId||null);
+  state.programs.push(prog);
+  if (studentId) {
+    const s = state.students.find(x=>x.id===studentId);
+    if (s) { s.programId = pid; prog.studentId = studentId; }
+  }
+  save(); closeModal();
+  openProgramEditor(pid);
+}
+
+function buildDefaultProgram(pid, name, studentId) {
+  return {
+    id: pid, name, studentId: studentId||null, totalWeeks: 12,
+    phases: [
+      buildPhase("Phase 1 — Fondations", PHASE_COLORS[0], "Construire les bases, activer les muscles, créer l'habitude.", 4),
+      buildPhase("Phase 2 — Intensité", PHASE_COLORS[1], "HIIT et exercices avancés. C'est ici que les kilos fondent.", 4),
+      buildPhase("Phase 3 — Brûlure", PHASE_COLORS[2], "Sprint final. Densité maximale, exercices avancés.", 4),
+    ]
+  };
+}
+
+function buildPhase(title, color, desc, weekCount) {
+  const weeks = [];
+  for (let i=1; i<=weekCount; i++) {
+    weeks.push({
+      id: uid(), title: "Semaine "+i, label: "Semaine "+i,
+      days: ["training","rest","training","rest","training","rest","rest"],
+      exercises: DEFAULT_EXERCISES.slice(0,4).map(e=>({...e, id:uid()}))
+    });
+  }
+  return { id:uid(), title, color, desc, weeks };
+}
+
+// ─── PROGRAM EDITOR ───
+function openProgramEditor(pid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  if (!prog) return;
+  const s = prog.studentId ? state.students.find(x=>x.id===prog.studentId) : null;
+
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">✏️ ${esc(prog.name)}</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    ${s ? `<div style="font-size:12px;color:var(--text3);margin-bottom:14px">Programme de ${esc(s.name)}</div>` : ''}
+    <div class="field-group">
+      <div class="field-label">Nom du programme</div>
+      <input id="pe-name" class="field-input" value="${esc(prog.name)}">
+    </div>
+
+    <div class="modal-divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Phases & Semaines</div>
+      <button class="btn btn-surface btn-sm" onclick="openAddPhaseModal('${pid}')">+ Phase</button>
+    </div>
+    <div id="pe-phases-list">${renderPhasesForEditor(prog)}</div>
+
+    <div class="modal-btns" style="margin-top:20px">
+      <button class="btn btn-accent" onclick="saveProgramMeta('${pid}')">Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
+    </div>
+  `, true);
+}
+
+function renderPhasesForEditor(prog) {
+  if (!prog.phases.length) return `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Aucune phase — cliquez "+ Phase"</div>`;
+  return prog.phases.map((ph,pi)=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer"
+           onclick="toggleEditorPhase('ephase-${ph.id}')">
+        <div style="width:10px;height:10px;border-radius:50%;background:${ph.color};flex-shrink:0"></div>
+        <span style="font-weight:600;font-size:14px;flex:1">${esc(ph.title)}</span>
+        <span style="font-size:11px;color:var(--text3)">${ph.weeks.length} sem.</span>
+        <button class="btn btn-surface btn-sm" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();openEditPhaseModal('${prog.id}','${ph.id}')">✏️</button>
+        <button class="btn btn-red btn-sm" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();deletePhase('${prog.id}','${ph.id}')">✕</button>
+        <span style="font-size:11px;color:var(--text3)">▼</span>
+      </div>
+      <div id="ephase-${ph.id}" style="display:none;padding:0 14px 12px">
+        ${ph.weeks.map((w,wi)=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border);font-size:13px">
+            <span style="color:var(--text2)">${esc(w.title||w.label)}</span>
+            <div style="display:flex;gap:5px">
+              <button class="btn btn-surface btn-sm" style="padding:4px 8px;font-size:11px" onclick="openWeekEditor('${prog.id}','${ph.id}','${w.id}')">✏️ Exercices</button>
+              <button class="btn btn-red btn-sm" style="padding:4px 8px;font-size:11px" onclick="deleteWeek('${prog.id}','${ph.id}','${w.id}')">✕</button>
+            </div>
+          </div>`).join('')}
+        <button class="btn btn-surface btn-sm" style="margin-top:8px;width:100%" onclick="addWeek('${prog.id}','${ph.id}')">+ Semaine</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleEditorPhase(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+function saveProgramMeta(pid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  if (!prog) return;
+  prog.name = document.getElementById('pe-name').value || prog.name;
+  prog.totalWeeks = prog.phases.reduce((a,ph)=>a+ph.weeks.length, 0);
+  save(); closeModal(); renderDashboard(); renderStudents(); renderTemplates();
+}
+
+// ─── ADD/EDIT PHASE ───
+function openAddPhaseModal(pid) {
+  const colorIdx = (state.programs.find(p=>p.id===pid)?.phases.length||0) % PHASE_COLORS.length;
+  renderPhaseForm(pid, null, PHASE_COLORS[colorIdx]);
+}
+function openEditPhaseModal(pid, phid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  const ph = prog?.phases.find(x=>x.id===phid);
+  if (!ph) return;
+  renderPhaseForm(pid, ph, ph.color);
+}
+function renderPhaseForm(pid, ph, defaultColor) {
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">${ph?'Modifier la phase':'Nouvelle phase'}</span>
+      <button class="modal-close" onclick="closeModal();openProgramEditor('${pid}')">✕</button>
+    </div>
+    <div class="phase-form-grid">
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Titre</div>
+        <input id="pf-title" class="field-input" value="${ph?esc(ph.title):''}" placeholder="ex: Phase 1 — Fondations">
+      </div>
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Couleur</div>
+        <select id="pf-color" class="field-input" style="appearance:auto">
+          ${PHASE_COLORS.map(c=>`<option value="${c}" ${(ph?ph.color:defaultColor)===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field-group" style="margin-top:12px">
+      <div class="field-label">Description</div>
+      <textarea id="pf-desc" class="field-input field-textarea" placeholder="Décrivez les objectifs de cette phase...">${ph?esc(ph.desc||''):''}</textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Nombre de semaines à créer ${ph?'(en ajouter)':''}</div>
+      <input id="pf-weeks" class="field-input" type="number" min="1" max="24" value="${ph?0:4}">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-accent" onclick="savePhaseForm('${pid}','${ph?ph.id:''}')">Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeModal();openProgramEditor('${pid}')">Annuler</button>
+    </div>
+  `);
+}
+
+function savePhaseForm(pid, phid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  if (!prog) return;
+  const title = document.getElementById('pf-title').value.trim() || "Phase";
+  const color = document.getElementById('pf-color').value;
+  const desc  = document.getElementById('pf-desc').value;
+  const weeksToAdd = parseInt(document.getElementById('pf-weeks').value)||0;
+  const newWeeks = [];
+  for (let i=0; i<weeksToAdd; i++) {
+    newWeeks.push({ id:uid(), title:`Semaine ${i+1}`, label:`Semaine ${i+1}`,
+      days:["training","rest","training","rest","training","rest","rest"],
+      exercises: DEFAULT_EXERCISES.slice(0,3).map(e=>({...e,id:uid()})) });
+  }
+  if (phid) {
+    const ph = prog.phases.find(x=>x.id===phid);
+    if (ph) { ph.title=title; ph.color=color; ph.desc=desc; ph.weeks.push(...newWeeks); }
+  } else {
+    prog.phases.push({ id:uid(), title, color, desc, weeks:newWeeks });
+  }
+  prog.totalWeeks = prog.phases.reduce((a,ph)=>a+ph.weeks.length,0);
+  save(); openProgramEditor(pid);
+}
+
+function deletePhase(pid, phid) {
+  if (!confirm('Supprimer cette phase ?')) return;
+  const prog = state.programs.find(p=>p.id===pid);
+  if (!prog) return;
+  prog.phases = prog.phases.filter(x=>x.id!==phid);
+  prog.totalWeeks = prog.phases.reduce((a,ph)=>a+ph.weeks.length,0);
+  save(); openProgramEditor(pid);
+}
+
+// ─── WEEK EDITOR ───
+function addWeek(pid, phid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  const ph = prog?.phases.find(x=>x.id===phid);
+  if (!ph) return;
+  const wnum = ph.weeks.length+1;
+  ph.weeks.push({ id:uid(), title:`Semaine ${wnum}`, label:`Semaine ${wnum}`,
+    days:["training","rest","training","rest","training","rest","rest"],
+    exercises: DEFAULT_EXERCISES.slice(0,3).map(e=>({...e,id:uid()})) });
+  prog.totalWeeks = prog.phases.reduce((a,ph)=>a+ph.weeks.length,0);
+  save(); openProgramEditor(pid);
+}
+
+function deleteWeek(pid, phid, wid) {
+  if (!confirm('Supprimer cette semaine ?')) return;
+  const prog = state.programs.find(p=>p.id===pid);
+  const ph = prog?.phases.find(x=>x.id===phid);
+  if (!ph) return;
+  ph.weeks = ph.weeks.filter(w=>w.id!==wid);
+  prog.totalWeeks = prog.phases.reduce((a,ph)=>a+ph.weeks.length,0);
+  save(); openProgramEditor(pid);
+}
+
+function openWeekEditor(pid, phid, wid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  const ph = prog?.phases.find(x=>x.id===phid);
+  const w = ph?.weeks.find(x=>x.id===wid);
+  if (!w) return;
+
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">✏️ ${esc(w.title)}</span>
+      <button class="modal-close" onclick="closeModal();openProgramEditor('${pid}')">✕</button>
+    </div>
+    <div class="week-builder-grid" style="margin-bottom:14px">
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Titre de la semaine</div>
+        <input id="we-title" class="field-input" value="${esc(w.title)}">
+      </div>
+      <div class="field-group" style="margin:0">
+        <div class="field-label">Séances (jours actifs)</div>
+        <div class="day-selector" id="we-days">
+          ${DAY_LABELS.map((d,i)=>`
+            <div class="day-toggle ${w.days[i]==='training'?'on':''}"
+                 onclick="toggleDay(${i})">${d}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="field-label" style="margin-bottom:8px">Exercices</div>
+    <div style="display:grid;grid-template-columns:1fr 90px 70px auto;gap:6px;margin-bottom:6px;font-size:10px;letter-spacing:1px;color:var(--text3);padding:0 12px">
+      <span>NOM</span><span>SÉRIES</span><span>REPOS</span><span></span>
+    </div>
+    <div class="ex-list-builder" id="we-exercises">
+      ${w.exercises.map(ex=>exRowHTML(ex)).join('')}
+    </div>
+    <button class="btn btn-surface btn-sm" style="margin-top:8px;width:100%" onclick="addExRow()">+ Exercice</button>
+    <div class="field-group" style="margin-top:14px">
+      <div class="field-label">Conseil général pour la semaine (optionnel)</div>
+      <input id="we-note" class="field-input" value="${esc(w.note||'')}" placeholder="ex: Focus sur la technique...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-accent" onclick="saveWeekEditor('${pid}','${phid}','${wid}')">Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeModal();openProgramEditor('${pid}')">Annuler</button>
+    </div>
+  `, true);
+}
+
+function exRowHTML(ex) {
+  return `<div class="ex-row-builder" id="exrow-${ex.id}">
+    <input class="ex-row-input" placeholder="Nom de l'exercice" value="${esc(ex.name)}" data-field="name">
+    <input class="ex-row-input" placeholder="3 × 10" value="${esc(ex.sets)}" data-field="sets" style="text-align:center">
+    <input class="ex-row-input" placeholder="60s" value="${esc(ex.rest)}" data-field="rest" style="text-align:center">
+    <button class="ex-del-btn" onclick="removeExRow('exrow-${ex.id}')">✕</button>
+  </div>`;
+}
+
+function addExRow() {
+  const id = uid();
+  const div = document.createElement('div');
+  div.innerHTML = exRowHTML({id, name:'', sets:'3 × 10', rest:'60s', tip:''});
+  document.getElementById('we-exercises').appendChild(div.firstChild);
+}
+
+function removeExRow(rowId) {
+  const el = document.getElementById(rowId);
+  if (el) el.remove();
+}
+
+function toggleDay(i) {
+  const dots = document.querySelectorAll('.day-toggle');
+  if (dots[i]) dots[i].classList.toggle('on');
+}
+
+function saveWeekEditor(pid, phid, wid) {
+  const prog = state.programs.find(p=>p.id===pid);
+  const ph = prog?.phases.find(x=>x.id===phid);
+  const w = ph?.weeks.find(x=>x.id===wid);
+  if (!w) return;
+  w.title = document.getElementById('we-title').value || w.title;
+  w.label = w.title;
+  w.note = document.getElementById('we-note').value;
+  // days
+  const toggles = document.querySelectorAll('.day-toggle');
+  w.days = Array.from(toggles).map(t=>t.classList.contains('on')?'training':'rest');
+  // exercises
+  const rows = document.querySelectorAll('#we-exercises .ex-row-builder');
+  w.exercises = Array.from(rows).map(row=>({
+    id: row.id.replace('exrow-',''),
+    name: row.querySelector('[data-field="name"]').value,
+    sets: row.querySelector('[data-field="sets"]').value,
+    rest: row.querySelector('[data-field="rest"]').value,
+    tip: ''
+  })).filter(e=>e.name.trim());
+  save(); openProgramEditor(pid);
+}
+
+// ─── COPY TEMPLATE ───
+function openCopyTemplateModal(pid) {
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">Copier vers un élève</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Choisir l'élève qui recevra une copie de ce programme :</p>
+    <div class="template-list">
+      ${state.students.map(s=>`
+        <div class="template-item" onclick="copyTemplateToStudent('${pid}','${s.id}')">
+          <div>
+            <div class="template-name">${esc(s.name)}</div>
+            <div class="template-meta">${esc(s.goal||'—')}</div>
+          </div>
+          <span style="color:var(--accent);font-size:13px">→</span>
+        </div>`).join('') || '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Aucun élève disponible</div>'}
+    </div>
+    <div class="modal-btns"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button></div>
+  `);
+}
+
+function copyTemplateToStudent(pid, sid) {
+  const orig = state.programs.find(p=>p.id===pid);
+  if (!orig) return;
+  const copy = JSON.parse(JSON.stringify(orig));
+  // give new ids
+  copy.id = uid();
+  copy.studentId = sid;
+  copy.phases.forEach(ph=>{ ph.id=uid(); ph.weeks.forEach(w=>{ w.id=uid(); w.exercises.forEach(e=>e.id=uid()); }); });
+  state.programs.push(copy);
+  const s = state.students.find(x=>x.id===sid);
+  if (s) s.programId = copy.id;
+  save(); closeModal(); renderDashboard(); renderStudents();
+  alert(`Programme copié vers ${s?.name||'l\'élève'} ✓`);
+}
+
+function deleteProgram(pid) {
+  if (!confirm('Supprimer ce programme ?')) return;
+  state.programs = state.programs.filter(p=>p.id!==pid);
+  save(); renderTemplates();
+}
+
+// ═══════════════════════════════════════════════
+//  SHARE LINK
+// ═══════════════════════════════════════════════
+function openShareModal(sid) {
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) return;
+  const link = window.location.origin + window.location.pathname + '?eleve=' + sid;
+  showModal(`
+    <div class="modal-head">
+      <span class="modal-title">🔗 Lien de ${esc(s.name)}</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
+      Envoyez ce lien à votre élève. Il verra son programme personnalisé et pourra suivre sa progression.
+    </p>
+    <div class="share-box">
+      <span class="share-link" id="share-link-text">${link}</span>
+      <button class="copy-btn" onclick="copyLink()">Copier</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:10px">
+      ⚠️ Le lien doit être ouvert sur le même appareil/navigateur que celui où le programme est enregistré, ou après déploiement en ligne.
+    </p>
+    <div class="modal-btns"><button class="btn btn-ghost" onclick="closeModal()">Fermer</button></div>
+  `);
+}
+
+function copyLink() {
+  const text = document.getElementById('share-link-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Copié !';
+    setTimeout(()=>btn.textContent='Copier', 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  STUDENT VIEW
+// ═══════════════════════════════════════════════
+function loadStudentView(sid) {
+  currentStudentId = sid;
+  const s = state.students.find(x=>x.id===sid);
+  if (!s) { document.getElementById('s-student-name').textContent = "Programme introuvable"; showScreen('student'); return; }
+  const prog = getProgramForStudent(sid);
+
+  // topbar
+  document.getElementById('student-topbar-coach').textContent = 'Programme de ' + (state.coachName||'votre coach');
+
+  // hero
+  const parts = s.name.trim().split(' ');
+  const lastName = parts.length>1 ? parts.slice(1).join(' ') : '';
+  const firstName = parts[0];
+  document.getElementById('s-student-name').innerHTML =
+    lastName ? `${esc(firstName)}<br><span class="hl">${esc(lastName.toUpperCase())}</span>` : `<span class="hl">${esc(firstName)}</span>`;
+
+  document.getElementById('s-programme-tag').textContent = prog?.name || 'Programme Callisthénie';
+  document.getElementById('s-coach-name-display').textContent = state.coachName||'votre coach';
+  document.getElementById('s-coach-note').textContent = '"' + (s.note||'Bienvenue dans votre programme. Restez régulier, mangez propre, dormez bien. Vous pouvez le faire ! 💪') + '"';
+
+  // meta
+  const meta = document.getElementById('s-hero-meta');
+  const totalW = prog ? getAllWeekIds(prog).length : 0;
+  meta.innerHTML = `
+    <div class="hero-meta-item"><span class="hero-meta-dot"></span> ${totalW} semaines</div>
+    <div class="hero-meta-item"><span class="hero-meta-dot"></span> ${(prog?.phases||[]).length} phases</div>
+    <div class="hero-meta-item"><span class="hero-meta-dot"></span> ${esc(s.goal||'Objectif personnel')}</div>
+  `;
+
+  // progress
+  const progress = getProgress(sid);
+  const allWeeks = prog ? getAllWeekIds(prog) : [];
+  const pct = allWeeks.length ? Math.round((progress.length/allWeeks.length)*100) : 0;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('s-prog-fill').style.width = pct + '%';
+
+  // week dots
+  const dotsEl = document.getElementById('s-weeks-dots');
+  dotsEl.innerHTML = allWeeks.map((wid,i)=>`
+    <div class="op-week ${progress.includes(wid)?'done':''}" onclick="toggleWeekProgress('${wid}')">
+      <div class="op-week-n">S${i+1}</div>
+      <div class="op-week-check">${progress.includes(wid)?'✓':'○'}</div>
+    </div>`).join('');
+
+  // phases & weeks
+  const tabsEl = document.getElementById('s-phase-tabs');
+  const panelsEl = document.getElementById('s-phase-panels');
+  if (!prog) {
+    tabsEl.innerHTML=''; panelsEl.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun programme assigné pour l\'instant.</div>';
+    showScreen('student'); return;
+  }
+
+  tabsEl.innerHTML = prog.phases.map((ph,i)=>`
+    <button class="phase-tab ${i===0?'active':''}" onclick="showStudentPhase('sph-${ph.id}',this)">${esc(ph.title)}</button>`).join('');
+
+  panelsEl.innerHTML = prog.phases.map((ph,pi)=>`
+    <div class="student-phase-panel ${pi===0?'active':''}" id="sph-${ph.id}">
+      <div class="student-phase-banner">
+        <div>
+          <div class="spb-title" style="color:${ph.color}">${esc(ph.title)}</div>
+          <div class="spb-desc">${esc(ph.desc||'')}</div>
+        </div>
+        <div class="spb-stats">
+          <div class="spb-stat"><div class="spb-stat-num">${ph.weeks.length}</div><div class="spb-stat-label">Semaines</div></div>
+          <div class="spb-stat"><div class="spb-stat-num">${ph.weeks.reduce((a,w)=>a+w.exercises.length,0)}</div><div class="spb-stat-label">Exercices</div></div>
+        </div>
+      </div>
+      <div class="weeks-list">
+        ${ph.weeks.map(w=>studentWeekHTML(w,progress,ph.color)).join('')}
+      </div>
+    </div>`).join('');
+
+  showScreen('student');
+}
+
+function studentWeekHTML(w, progress, color) {
+  const done = progress.includes(w.id);
+  return `
+    <div class="s-week-card ${done?'done':''}" id="swc-${w.id}">
+      <div class="s-week-header" onclick="toggleStudentWeek('swb-${w.id}','swchev-${w.id}')">
+        <div class="s-week-check ${done?'checked':''}" onclick="event.stopPropagation();toggleWeekProgress('${w.id}')">${done?'✓':''}</div>
+        <div style="flex:1">
+          <div class="s-week-title">${esc(w.title)}</div>
+          <div class="s-week-meta">${w.exercises.length} exercice${w.exercises.length>1?'s':''} · ${w.days.filter(d=>d==='training').length} séances</div>
+        </div>
+        <div class="s-week-days">
+          ${w.days.map((d,i)=>`<div class="s-day-dot ${d}">${DAY_LABELS[i]}</div>`).join('')}
+        </div>
+        <span class="s-week-expand" id="swchev-${w.id}">▼</span>
+      </div>
+      <div class="s-week-body" id="swb-${w.id}">
+        ${w.note?`<div style="font-size:12px;color:var(--gold);margin-bottom:10px;font-style:italic">💬 ${esc(w.note)}</div>`:''}
+        <div class="s-ex-grid">
+          ${w.exercises.map(ex=>`
+            <div class="s-ex-card">
+              <div class="s-ex-name">${esc(ex.name)}</div>
+              <div class="s-ex-sets" style="color:${color}">${esc(ex.sets)}</div>
+              <div class="s-ex-rest">Repos : ${esc(ex.rest)}</div>
+              ${ex.tip?`<div class="s-ex-tip">${esc(ex.tip)}</div>`:''}
+            </div>`).join('')}
+        </div>
+        <button class="btn btn-surface btn-sm" style="margin-top:12px;width:100%"
+          onclick="toggleWeekProgress('${w.id}')">
+          ${progress.includes(w.id) ? '↩ Marquer comme non complétée' : '✓ Marquer comme complétée'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function toggleStudentWeek(bodyId, chevId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevId);
+  if (!body) return;
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+
+function showStudentPhase(panelId, btn) {
+  document.querySelectorAll('.student-phase-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.phase-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(panelId)?.classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleWeekProgress(wid) {
+  if (!currentStudentId) return;
+  const progress = getProgress(currentStudentId);
+  const idx = progress.indexOf(wid);
+  if (idx>=0) progress.splice(idx,1); else progress.push(wid);
+  setProgress(currentStudentId, progress);
+  loadStudentView(currentStudentId); // re-render
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════
+function showModal(html, wide=false) {
+  const box = document.getElementById('modal-box');
+  box.className = 'modal-box' + (wide?' modal-wide':'');
+  box.innerHTML = html;
+  document.getElementById('modal-bg').classList.remove('hide');
+}
+function closeModal() { document.getElementById('modal-bg').classList.add('hide'); }
+function closeModalBg(e) { if(e.target===document.getElementById('modal-bg')) closeModal(); }
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init() {
+  load();
+  // check if student view
+  const params = new URLSearchParams(window.location.search);
+  const sid = params.get('eleve');
+  if (sid) {
+    loadStudentView(sid);
+    return;
+  }
+  showScreen('splash');
+}
+
+init();
+</script>
+</body>
+</html>
